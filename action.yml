@@ -17,13 +17,25 @@ inputs:
     description: 'Starting version when no tags exist'
     required: false
     default: '0.0.0'
+  prerelease:
+    description: 'Prerelease identifier (e.g. rc, alpha, beta). When set, produces prerelease tags'
+    required: false
+    default: ''
+  prerelease_identifier:
+    description: 'How to generate prerelease identifier: "numbered" (rc.1, rc.2) or "sha" (rc.a1b2c3d)'
+    required: false
+    default: 'numbered'
+  include_sha:
+    description: 'Append short commit SHA to tag. "auto" includes SHA for prerelease only, "true" always includes, "false" never includes'
+    required: false
+    default: 'auto'
 
 outputs:
   version:
-    description: 'Next semantic version (e.g. 1.2.3)'
+    description: 'Next semantic version (e.g. 1.2.3 or 1.3.0-rc.1-a1b2c3d)'
     value: ${{ steps.semver.outputs.version }}
   version_tag:
-    description: 'Next version with prefix (e.g. v1.2.3)'
+    description: 'Next version with prefix (e.g. v1.2.3 or v1.3.0-rc.a1b2c3d)'
     value: ${{ steps.semver.outputs.version_tag }}
   previous_version:
     description: 'Previous version without prefix (e.g. 1.0.0)'
@@ -31,6 +43,12 @@ outputs:
   previous_version_tag:
     description: 'Previous version tag (e.g. v1.0.0), empty if no tags exist'
     value: ${{ steps.semver.outputs.previous_version_tag }}
+  base_version:
+    description: 'Base version without prerelease suffix or SHA (e.g. 1.3.0)'
+    value: ${{ steps.semver.outputs.base_version }}
+  base_version_tag:
+    description: 'Base version tag with prefix (e.g. v1.3.0)'
+    value: ${{ steps.semver.outputs.base_version_tag }}
   changelog:
     description: 'Markdown changelog grouped by commit type'
     value: ${{ steps.semver.outputs.changelog }}
@@ -40,6 +58,9 @@ outputs:
   last_commit:
     description: 'SHA of the HEAD commit at time of calculation'
     value: ${{ steps.semver.outputs.last_commit }}
+  rc_number:
+    description: 'Pre-release identifier (number or SHA). Only set when prerelease is used'
+    value: ${{ steps.semver.outputs.rc_number }}
 
 runs:
   using: composite
@@ -50,4 +71,7 @@ runs:
         INPUT_PREFIX: ${{ inputs.prefix }}
         INPUT_DEFAULT_BUMP: ${{ inputs.default_bump }}
         INPUT_INITIAL_VERSION: ${{ inputs.initial_version }}
+        INPUT_PRERELEASE: ${{ inputs.prerelease }}
+        INPUT_PRERELEASE_IDENTIFIER: ${{ inputs.prerelease_identifier }}
+        INPUT_INCLUDE_SHA: ${{ inputs.include_sha }}
       run: ${{ github.action_path }}/entrypoint.sh

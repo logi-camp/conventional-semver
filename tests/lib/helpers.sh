@@ -1,22 +1,43 @@
-pass() { echo -e "  ${GREEN}✓${NC} $1"; PASS=$((PASS + 1)); }
-fail() { echo -e "  ${RED}✗${NC} $1: $2"; FAIL=$((FAIL + 1)); ERRORS+=("$1: $2"); }
+SCENARIO_ERRORS=()
+
+begin_scenario() {
+  SCENARIO_ERRORS=()
+  CURRENT_SCENARIO="$1"
+}
+
+end_scenario() {
+  if [ "${#SCENARIO_ERRORS[@]}" -eq 0 ]; then
+    echo -e "  ${GREEN}✓${NC} ${CURRENT_SCENARIO}"
+    PASS=$((PASS + 1))
+  else
+    echo -e "  ${RED}✗${NC} ${CURRENT_SCENARIO}"
+    for e in "${SCENARIO_ERRORS[@]}"; do
+      echo -e "    ${RED}${e}${NC}"
+    done
+    FAIL=$((FAIL + 1))
+    ERRORS+=("$CURRENT_SCENARIO")
+  fi
+}
 
 assert_eq() {
   local name="$1" expected="$2" actual="$3"
-  if [ "$expected" = "$actual" ]; then pass "$name"
-  else fail "$name" "expected '${expected}', got '${actual}'"; fi
+  if [ "$expected" != "$actual" ]; then
+    SCENARIO_ERRORS+=("${name}: expected '${expected}', got '${actual}'")
+  fi
 }
 
 assert_contains() {
   local name="$1" needle="$2" haystack="$3"
-  if echo "$haystack" | grep -qF "$needle"; then pass "$name"
-  else fail "$name" "'${needle}' not found in output"; fi
+  if ! echo "$haystack" | grep -qF "$needle"; then
+    SCENARIO_ERRORS+=("${name}: '${needle}' not found")
+  fi
 }
 
 assert_not_contains() {
   local name="$1" needle="$2" haystack="$3"
-  if ! echo "$haystack" | grep -qF "$needle"; then pass "$name"
-  else fail "$name" "'${needle}' should not appear in output"; fi
+  if echo "$haystack" | grep -qF "$needle"; then
+    SCENARIO_ERRORS+=("${name}: '${needle}' should not appear")
+  fi
 }
 
 new_repo() {
@@ -49,6 +70,9 @@ run_action() {
     INPUT_PREFIX="${INPUT_PREFIX:-v}" \
     INPUT_DEFAULT_BUMP="${INPUT_DEFAULT_BUMP:-patch}" \
     INPUT_INITIAL_VERSION="${INPUT_INITIAL_VERSION:-0.0.0}" \
+    INPUT_PRERELEASE="${INPUT_PRERELEASE:-}" \
+    INPUT_PRERELEASE_IDENTIFIER="${INPUT_PRERELEASE_IDENTIFIER:-numbered}" \
+    INPUT_INCLUDE_SHA="${INPUT_INCLUDE_SHA:-auto}" \
     GITHUB_OUTPUT="$out" \
     bash "$ENTRYPOINT" >/dev/null
   )

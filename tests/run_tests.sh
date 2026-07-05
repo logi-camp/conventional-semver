@@ -38,6 +38,8 @@ source "${SCRIPT_DIR}/cases/outputs.sh"
 source "${SCRIPT_DIR}/cases/changelog.sh"
 # shellcheck source=cases/validation.sh
 source "${SCRIPT_DIR}/cases/validation.sh"
+# shellcheck source=cases/prerelease.sh
+source "${SCRIPT_DIR}/cases/prerelease.sh"
 
 echo ""
 echo -e "${BOLD}Results: ${GREEN}${PASS} passed${NC}  ${RED}${FAIL} failed${NC}"
