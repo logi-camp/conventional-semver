@@ -29,6 +29,16 @@ assert_contains "breaking entry"           "feat!: redesign API response" "$cl"
 end_scenario
 rm_repo "$r"
 
+begin_scenario "v1.0.0 + feat body: BREAKING CHANGE → Breaking Changes section"
+r=$(new_repo); commit "$r" "chore: init"; tag "$r" "v1.0.0"
+commit_with_body "$r" "feat: update config format" "BREAKING CHANGE: old config keys removed"
+o=$(run_action "$r")
+cl=$(get_multiline "$o" "changelog")
+assert_contains "Breaking Changes section" "## Breaking Changes"      "$cl"
+assert_contains "breaking entry"           "feat: update config format" "$cl"
+end_scenario
+rm_repo "$r"
+
 begin_scenario "v1.0.0 + docs (default_bump=none) → empty changelog"
 r=$(new_repo); commit "$r" "chore: init"; tag "$r" "v1.0.0"
 commit "$r" "docs: update readme"

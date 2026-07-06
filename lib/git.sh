@@ -14,11 +14,9 @@ find_latest_tag() {
 
 collect_commits() {
   if [ -n "$LOG_RANGE" ]; then
-    SUBJECTS=$(git log "$LOG_RANGE" --pretty=format:"%s" 2>/dev/null || true)
-    BODIES=$(git log "$LOG_RANGE" --pretty=format:"%b" 2>/dev/null || true)
+    COMMIT_LOG=$(git log "$LOG_RANGE" --pretty=format:"%s%n__BODY_SEP__%n%b%n__COMMIT_END__" 2>/dev/null || true)
   else
-    SUBJECTS=$(git log --pretty=format:"%s" 2>/dev/null || true)
-    BODIES=$(git log --pretty=format:"%b" 2>/dev/null || true)
+    COMMIT_LOG=$(git log --pretty=format:"%s%n__BODY_SEP__%n%b%n__COMMIT_END__" 2>/dev/null || true)
   fi
 
   LAST_COMMIT=$(git rev-parse HEAD 2>/dev/null || true)
