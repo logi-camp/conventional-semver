@@ -8,9 +8,9 @@ commit "$r" "fix: resolve null pointer on login"
 commit "$r" "perf: cache database queries"
 o=$(run_action "$r")
 cl=$(get_multiline "$o" "changelog")
-assert_contains     "Features section"       "## Features"                  "$cl"
-assert_contains     "Bug Fixes section"       "## Bug Fixes"                "$cl"
-assert_contains     "Perf section"            "## Performance Improvements" "$cl"
+assert_contains     "Features section"       "[Features]"                  "$cl"
+assert_contains     "Bug Fixes section"       "[Bug Fixes]"                "$cl"
+assert_contains     "Perf section"            "[Performance Improvements]" "$cl"
 assert_contains     "feat entry"              "feat: add dark mode toggle"  "$cl"
 assert_contains     "feat(scope) entry"       "feat(api): add pagination"   "$cl"
 assert_contains     "fix entry"               "fix: resolve null pointer"   "$cl"
@@ -24,7 +24,7 @@ r=$(new_repo); commit "$r" "chore: init"; tag "$r" "v1.0.0"
 commit "$r" "feat!: redesign API response format"
 o=$(run_action "$r")
 cl=$(get_multiline "$o" "changelog")
-assert_contains "Breaking Changes section" "## Breaking Changes"          "$cl"
+assert_contains "Breaking Changes section" "[Breaking Changes]"          "$cl"
 assert_contains "breaking entry"           "feat!: redesign API response" "$cl"
 end_scenario
 rm_repo "$r"
@@ -34,7 +34,7 @@ r=$(new_repo); commit "$r" "chore: init"; tag "$r" "v1.0.0"
 commit_with_body "$r" "feat: update config format" "BREAKING CHANGE: old config keys removed"
 o=$(run_action "$r")
 cl=$(get_multiline "$o" "changelog")
-assert_contains "Breaking Changes section" "## Breaking Changes"      "$cl"
+assert_contains "Breaking Changes section" "[Breaking Changes]"      "$cl"
 assert_contains "breaking entry"           "feat: update config format" "$cl"
 end_scenario
 rm_repo "$r"
@@ -64,10 +64,10 @@ cl=$(get_multiline "$o" "changelog")
 echo -e "  ${BOLD}--- changelog (all types) ---${NC}"
 echo "$cl" | sed 's/^/    /'
 echo -e "  ${BOLD}--- end ---${NC}"
-assert_contains "Breaking Changes" "## Breaking Changes" "$cl"
-assert_contains "Features"         "## Features"         "$cl"
-assert_contains "Bug Fixes"        "## Bug Fixes"        "$cl"
-assert_contains "Performance"      "## Performance"      "$cl"
+assert_contains "Breaking Changes" "[Breaking Changes]" "$cl"
+assert_contains "Features"         "[Features]"         "$cl"
+assert_contains "Bug Fixes"        "[Bug Fixes]"        "$cl"
+assert_contains "Performance"      "[Performance"        "$cl"
 assert_not_contains "no chore"     "chore:"              "$cl"
 end_scenario
 rm_repo "$r"
@@ -84,10 +84,10 @@ cl=$(get_multiline "$o" "changelog")
 echo -e "  ${BOLD}--- changelog (feat + fix + breaking body) ---${NC}"
 echo "$cl" | sed 's/^/    /'
 echo -e "  ${BOLD}--- end ---${NC}"
-assert_contains "Breaking Changes" "## Breaking Changes"     "$cl"
+assert_contains "Breaking Changes" "[Breaking Changes]"     "$cl"
 assert_contains "breaking entry"   "feat: redesign config"   "$cl"
-assert_contains "Features"         "## Features"             "$cl"
-assert_contains "Bug Fixes"        "## Bug Fixes"            "$cl"
+assert_contains "Features"         "[Features]"             "$cl"
+assert_contains "Bug Fixes"        "[Bug Fixes]"            "$cl"
 end_scenario
 rm_repo "$r"
 
@@ -99,10 +99,10 @@ cl=$(get_multiline "$o" "changelog")
 echo -e "  ${BOLD}--- changelog (breaking body only) ---${NC}"
 echo "$cl" | sed 's/^/    /'
 echo -e "  ${BOLD}--- end ---${NC}"
-assert_contains "Breaking Changes" "## Breaking Changes"    "$cl"
+assert_contains "Breaking Changes" "[Breaking Changes]"    "$cl"
 assert_contains "breaking entry"   "fix: handle edge case"  "$cl"
-assert_not_contains "no Features"  "## Features"            "$cl"
-assert_not_contains "no Bug Fixes" "## Bug Fixes"           "$cl"
+assert_not_contains "no Features"  "[Features]"            "$cl"
+assert_not_contains "no Bug Fixes" "[Bug Fixes]"           "$cl"
 end_scenario
 rm_repo "$r"
 
@@ -116,11 +116,11 @@ cl=$(get_multiline "$o" "changelog")
 echo -e "  ${BOLD}--- changelog (feat! mixed) ---${NC}"
 echo "$cl" | sed 's/^/    /'
 echo -e "  ${BOLD}--- end ---${NC}"
-assert_contains "Breaking Changes" "## Breaking Changes"    "$cl"
+assert_contains "Breaking Changes" "[Breaking Changes]"    "$cl"
 assert_contains "breaking entry"   "feat!: change auth API" "$cl"
-assert_contains "Features"         "## Features"            "$cl"
+assert_contains "Features"         "[Features]"            "$cl"
 assert_contains "feat entry"       "feat: add user profiles" "$cl"
-assert_contains "Bug Fixes"        "## Bug Fixes"           "$cl"
+assert_contains "Bug Fixes"        "[Bug Fixes]"           "$cl"
 assert_contains "fix entry"        "fix: typo in error"     "$cl"
 end_scenario
 rm_repo "$r"

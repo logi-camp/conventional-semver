@@ -61,17 +61,17 @@ The highest bump found across all commits since the last tag wins (major > minor
 The `changelog` output is a markdown string grouped by commit type:
 
 ```markdown
-## Breaking Changes
+[Breaking Changes]
 - feat!: redesign API response format
 
-## Features
+[Features]
 - feat: add dark mode toggle
 - feat(api): add pagination support
 
-## Bug Fixes
+[Bug Fixes]
 - fix: resolve null pointer on login
 
-## Performance Improvements
+[Performance Improvements]
 - perf: cache database queries
 ```
 
