@@ -239,3 +239,29 @@ jobs:
           tag_name: ${{ steps.semver.outputs.version_tag }}
           body: ${{ steps.semver.outputs.changelog }}
 ```
+
+### Annotated tag with changelog (Gitea CI)
+
+```yaml
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      rc_tag: ${{ steps.semver.outputs.version_tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: logi-camp/conventioanl-semver@v1
+        id: semver
+
+      - name: Tag commit
+        if: steps.semver.outputs.bump != 'none'
+        run: |
+          git config user.email "ci@your-domain.com"
+          git config user.name "CI Bot"
+          TAG_MSG=$(printf "%s\n\n%s" "${{ steps.semver.outputs.version_tag }}" "${{ steps.semver.outputs.changelog }}")
+          git tag -a ${{ steps.semver.outputs.version_tag }} -m "$TAG_MSG"
+          git push https://${{ secrets.ROBOT_USERNAME }}:${{ secrets.ROBOT_TOKEN }}@${{ vars.GIT_SERVER }}/${{ github.repository }}.git ${{ steps.semver.outputs.version_tag }}
+```
